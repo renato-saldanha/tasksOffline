@@ -2,8 +2,8 @@ export default {
   fontFamily: 'Lato',
   colors: {
     secondary: '#FFF',
-    month: '',
-    tomorrow: '',
+    mainText: '#222',
+    subText: '#555',
     week: '',
   },
-}
+};

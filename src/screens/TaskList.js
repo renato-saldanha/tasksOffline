@@ -5,6 +5,7 @@ import {
   ImageBackground,
   StyleSheet,
   View,
+  FlatList,
 } from 'react-native';
 
 import moment from 'moment';
@@ -15,6 +16,47 @@ import commonStyles from '../commonStyles.js';
 import Task from '../components/Task';
 
 export default class TaskList extends Component {
+  state = {
+    tasks: [
+      {
+        id: 1,
+        descricao: 'Comprar Livro',
+        dataEstimada: new Date(),
+        dataConclusao: new Date(),
+      },
+      {
+        id: 2,
+        descricao: 'Ler Livro',
+        dataEstimada: new Date(),
+        dataConclusao: new Date('2022-04-15'),
+      },
+      {
+        id: 3,
+        descricao: 'Arrumar a Casa',
+        dataEstimada: new Date(),
+        dataConclusao: new Date('2022-10-15'),
+      },
+      {
+        id: 4,
+        descricao: 'Fazer Compras',
+        dataEstimada: new Date('2022-04-15'),
+        dataConclusao: new Date('2022-04-17'),
+      },
+      {
+        id: 5,
+        descricao: 'Levar Cachorro Passear',
+        dataEstimada: new Date('2022-04-15'),
+        dataConclusao: new Date('2022-10-15'),
+      },
+      {
+        id: 6,
+        descricao: 'Comprar Presente',
+        dataEstimada: new Date('2022-05-25'),
+        dataConclusao: new Date('2022-16-05'),
+      },
+    ],
+  };
+
   render() {
     const today = moment().locale('pt-br').format('ddd, D [de] MMMM');
     return (
@@ -26,15 +68,10 @@ export default class TaskList extends Component {
           </View>
         </ImageBackground>
         <View style={styles.taskList}>
-          <Task
-            descricao="Tarefa Tal"
-            dataEstimada={new Date().toDateString()}
-            dataConclusao={new Date().toDateString()}
-          />
-          <Task
-            descricao="Limpar"
-            dataEstimada={new Date().toDateString()}
-            dataConclusao={null}
+          <FlatList
+            data={this.state.tasks}
+            keyExtractor={i => i.id}
+            renderItem={({i}) => <Task {...i} />}
           />
         </View>
       </SafeAreaView>
