@@ -6,7 +6,10 @@ import {
   StyleSheet,
   View,
   FlatList,
+  TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -14,69 +17,91 @@ import 'moment/locale/pt-br';
 import TodayImage from '../../assets/imgs/today.jpg';
 import commonStyles from '../commonStyles.js';
 import Task from '../components/Task';
+import Tasks from '../classes/Tasks';
 
 export default class TaskList extends Component {
-  state = {
-    tasks: [
-      {
-        id: 1,
-        descricao: 'Comprar Livro',
-        dataEstimada: new Date(),
-        dataConclusao: new Date(),
-      },
-      {
-        id: 2,
-        descricao: 'Ler Livro',
-        dataEstimada: new Date(),
-        dataConclusao: new Date('2022-04-15'),
-      },
-      {
-        id: 3,
-        descricao: 'Arrumar a Casa',
-        dataEstimada: new Date(),
-        dataConclusao: new Date('2022-10-15'),
-      },
-      {
-        id: 4,
-        descricao: 'Fazer Compras',
-        dataEstimada: new Date('2022-04-15'),
-        dataConclusao: new Date('2022-04-17'),
-      },
-      {
-        id: 5,
-        descricao: 'Levar Cachorro Passear',
-        dataEstimada: new Date('2022-04-15'),
-        dataConclusao: new Date('2022-10-15'),
-      },
-      {
-        id: 6,
-        descricao: 'Comprar Presente',
-        dataEstimada: new Date('2022-05-25'),
-        dataConclusao: new Date('2022-16-05'),
-      },
-    ],
-  };
+  state = Tasks;
 
   render() {
     const today = moment().locale('pt-br').format('ddd, D [de] MMMM');
+
     return (
       <SafeAreaView style={styles.container}>
         <ImageBackground source={TodayImage} style={styles.background}>
+          <TouchableWithoutFeedback
+            onPress={() => this.marcarDesmarcarVisibilidade()}>
+            <View style={styles.seeUnsee} size={30}>
+              {this.getIconeMostrarOcultar()}
+            </View>
+          </TouchableWithoutFeedback>
+
           <View style={styles.titlebar}>
             <Text style={styles.title}>Hoje</Text>
             <Text style={styles.subTitle}>{today}</Text>
           </View>
         </ImageBackground>
+
         <View style={styles.taskList}>
           <FlatList
-            data={this.state.tasks}
-            keyExtractor={i => i.id}
-            renderItem={({i}) => <Task {...i} />}
+            data={this.state.tasksVisiveis}
+            keyExtractor={item => `${item.id}`}
+            renderItem={({item}) => (
+              <Task
+                {...item}
+                {...this.state}
+                verificarMarcacaoTask={this.verificarMarcacaoTask}
+                /* Comunicação indireta */
+              />
+            )}
           />
         </View>
       </SafeAreaView>
     );
   }
+
+  componentDidMount = () => {
+    this.mostrarOcultarTasksConcluidas();
+  };
+
+  /* Comunicação indireta */
+  verificarMarcacaoTask = id => {
+    const tasks = [...this.state.tasks];
+    tasks.forEach(t => {
+      if (t.id === id && t.dataConclusao === null) {
+        t.dataConclusao = new Date();
+      } else if (t.id === id && t.dataConclusao !== null) {
+        t.dataConclusao = null;
+      }
+    });
+    this.setState({tasks});
+  };
+
+  marcarDesmarcarVisibilidade = () => {
+    this.setState(
+      {mostrarTasksConcluidas: !this.state.mostrarTasksConcluidas},
+      this.mostrarOcultarTasksConcluidas,
+    );
+  };
+
+  mostrarOcultarTasksConcluidas = () => {
+    let tasksVisiveis = null;
+
+    if (this.state.mostrarTasksConcluidas) {
+      tasksVisiveis = this.state.tasks;
+    } else {
+      tasksVisiveis = this.state.tasks.filter(t => t.dataConclusao === null);
+    }
+
+    this.setState({tasksVisiveis});
+  };
+
+  getIconeMostrarOcultar = () => {
+    let iconName;
+    this.state.mostrarTasksConcluidas
+      ? (iconName = 'eye-slash')
+      : (iconName = 'eye');
+    return <Icon name={iconName} size={30} color="#FFD9" />;
+  };
 }
 
 const styles = StyleSheet.create({
@@ -106,5 +131,11 @@ const styles = StyleSheet.create({
     color: commonStyles.colors.secondary,
     marginLeft: 20,
     marginBottom: 30,
+  },
+  seeUnsee: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    padding: 15,
   },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import commonStyles from '../commonStyles';
@@ -7,7 +7,7 @@ import commonStyles from '../commonStyles';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
-export default props => {
+export default (props, state) => {
   const estiloConcluidoOuNao =
     props.dataConclusao != null ? {textDecorationLine: 'line-through'} : {};
 
@@ -18,9 +18,12 @@ export default props => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.checkContainer}>
-        {getCheckView(props.dataConclusao)}
-      </View>
+      <TouchableWithoutFeedback
+        onPress={() => props.verificarMarcacaoTask(props.id)}>
+        <View style={styles.checkContainer}>
+          {getCheckView(props.dataConclusao)}
+        </View>
+      </TouchableWithoutFeedback>
       <View>
         <Text style={[styles.descricao, estiloConcluidoOuNao]}>
           {props.descricao}
@@ -32,15 +35,17 @@ export default props => {
 };
 
 function getCheckView(dataConclusao) {
+  let view;
   if (dataConclusao != null) {
-    return (
+    view = (
       <View style={styles.concluido}>
         <Icon name="check" size={20} color="#FFF" />
       </View>
     );
   } else {
-    return <View style={styles.pendente} />;
+    view = <View style={styles.pendente} />;
   }
+  return view;
 }
 
 const styles = StyleSheet.create({
