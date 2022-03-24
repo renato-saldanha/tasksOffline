@@ -34,16 +34,16 @@ export default class TaskList extends Component {
         />
 
         <ImageBackground source={TodayImage} style={styles.background}>
-          <TouchableWithoutFeedback
-            onPress={() => this.marcarDesmarcarVisibilidade()}>
-            <View style={styles.seeUnsee} size={30}>
+          <View style={styles.seeUnsee}>
+            <TouchableWithoutFeedback
+              onPress={this.marcarDesmarcarVisibilidade}>
               <Icon
                 name={this.state.mostrarTasksConcluidas ? 'eye-slash' : 'eye'}
-                size={30}
+                size={20}
                 color="#FFD9"
               />
-            </View>
-          </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback>
+          </View>
 
           <View style={styles.titlebar}>
             <Text style={styles.title}>Hoje</Text>
@@ -65,8 +65,11 @@ export default class TaskList extends Component {
             )}
           />
         </View>
-        <TouchableOpacity style={styles.touchIncluirTask}>
-          <Icon name="plus" size={30} color={commonStyles.colors.secondary} />
+        <TouchableOpacity
+          style={styles.touchIncluirTask}
+          onPress={() => this.setState({mostrarAdicionarTask: true})}
+          activeOpacity={0.7}>
+          <Icon name="plus" size={2m 0} color={commonStyles.colors.secondary} />
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -112,6 +115,7 @@ export default class TaskList extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection:'column',
   },
   background: {
     flex: 3,
@@ -145,15 +149,14 @@ const styles = StyleSheet.create({
   },
   touchIncluirTask: {
     position: 'absolute',
-    opacity: 0.7,
-    Right: 30,
+    opacity: 0.9,
+    Left: 30,
     bottom: 30,
     width: 50,
     height: 50,
     borderRadius: 25,
     backgroundColor: commonStyles.colors.today,
-    flexDirection: 'row',
     justifyContent: 'center',
-    alignContent: 'center',
+    alignItems: 'center',
   },
 });
