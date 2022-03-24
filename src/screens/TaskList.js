@@ -7,17 +7,18 @@ import {
   View,
   FlatList,
   TouchableWithoutFeedback,
-  Platform,
+  TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
-import TodayImage from '../../assets/imgs/today.jpg';
 import commonStyles from '../commonStyles.js';
+import TodayImage from '../../assets/imgs/today.jpg';
 import Task from '../components/Task';
 import Tasks from '../classes/Tasks';
+import AdicionarTask from './AdicionarTask';
 
 export default class TaskList extends Component {
   state = Tasks;
@@ -27,11 +28,20 @@ export default class TaskList extends Component {
 
     return (
       <SafeAreaView style={styles.container}>
+        <AdicionarTask
+          isVisible={this.state.mostrarAdicionarTask}
+          onCancel={() => this.setState({mostrarAdicionarTask: false})}
+        />
+
         <ImageBackground source={TodayImage} style={styles.background}>
           <TouchableWithoutFeedback
             onPress={() => this.marcarDesmarcarVisibilidade()}>
             <View style={styles.seeUnsee} size={30}>
-              {this.getIconeMostrarOcultar()}
+              <Icon
+                name={this.state.mostrarTasksConcluidas ? 'eye-slash' : 'eye'}
+                size={30}
+                color="#FFD9"
+              />
             </View>
           </TouchableWithoutFeedback>
 
@@ -55,25 +65,15 @@ export default class TaskList extends Component {
             )}
           />
         </View>
+        <TouchableOpacity style={styles.touchIncluirTask}>
+          <Icon name="plus" size={30} color={commonStyles.colors.secondary} />
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
   componentDidMount = () => {
     this.mostrarOcultarTasksConcluidas();
-  };
-
-  /* Comunicação indireta */
-  verificarMarcacaoTask = id => {
-    const tasks = [...this.state.tasks];
-    tasks.forEach(t => {
-      if (t.id === id && t.dataConclusao === null) {
-        t.dataConclusao = new Date();
-      } else if (t.id === id && t.dataConclusao !== null) {
-        t.dataConclusao = null;
-      }
-    });
-    this.setState({tasks});
   };
 
   marcarDesmarcarVisibilidade = () => {
@@ -95,12 +95,17 @@ export default class TaskList extends Component {
     this.setState({tasksVisiveis});
   };
 
-  getIconeMostrarOcultar = () => {
-    let iconName;
-    this.state.mostrarTasksConcluidas
-      ? (iconName = 'eye-slash')
-      : (iconName = 'eye');
-    return <Icon name={iconName} size={30} color="#FFD9" />;
+  /* Comunicação indireta */
+  verificarMarcacaoTask = id => {
+    const tasks = [...this.state.tasks];
+    tasks.forEach(t => {
+      if (t.id === id && t.dataConclusao === null) {
+        t.dataConclusao = new Date();
+      } else if (t.id === id && t.dataConclusao !== null) {
+        t.dataConclusao = null;
+      }
+    });
+    this.setState({tasks}, this.mostrarOcultarTasksConcluidas);
   };
 }
 
@@ -137,5 +142,18 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
     padding: 15,
+  },
+  touchIncluirTask: {
+    position: 'absolute',
+    opacity: 0.7,
+    Right: 30,
+    bottom: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: commonStyles.colors.today,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignContent: 'center',
   },
 });
