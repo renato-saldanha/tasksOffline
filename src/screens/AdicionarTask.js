@@ -7,13 +7,52 @@ import {
   TextInput,
   StyleSheet,
   Text,
+  Platform,
 } from 'react-native';
-import commonStyles from '../commonStyles';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-const initialState = {descricao: '', dataEstimada: null};
+import commonStyles from '../commonStyles';
+import moment from 'moment';
+import 'moment/locale/pt-br';
+
+const initialState = {
+  descricao: '',
+  dataEstimada: new Date(),
+  mostrarDatePicker: false,
+};
 
 export default class AdicionarTask extends Component {
   state = {...initialState};
+
+  getDatePicker = () => {
+    let datePicker = (
+      <DateTimePicker
+        value={this.state.dataEstimada}
+        onChange={(_, dataEstimada) =>
+          this.setState({dataEstimada, mostrarDatePicker: false})
+        }
+        mode="date"
+      />
+    );
+
+    if (Platform.OS === 'android') {
+      datePicker = (
+        <View style={[styles.input, styles.data]}>
+          <TouchableOpacity
+            onPress={() => this.setState({mostrarDatePicker: true})}>
+            <Text>
+              {moment(this.state.dataEstimada).format(
+                'ddd, D [de] MMMM [de] YYYY',
+              )}
+            </Text>
+          </TouchableOpacity>
+          {this.state.mostrarDatePicker && datePicker}
+        </View>
+      );
+    }
+
+    return datePicker;
+  };
 
   render() {
     return (
@@ -34,14 +73,9 @@ export default class AdicionarTask extends Component {
             value={this.state.descricao}
             onChangeText={descricao => this.setState({descricao})}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Informe a data estimada para conclusão"
-            keyboardType="numeric"
-            maxLength={10}
-            value={this.state.dataEstimada}
-            onChangeText={dataEstimada => this.setState({dataEstimada})}
-          />
+
+          {this.getDatePicker(true)}
+
           <View style={styles.botoes}>
             <TouchableOpacity onPress={this.props.onCancel}>
               <Text style={styles.botao}>Cancelar</Text>
@@ -94,5 +128,9 @@ const styles = StyleSheet.create({
     margin: 20,
     marginRight: 30,
     color: commonStyles.colors.today,
+  },
+  data: {
+    fontSize: 20,
+    justifyContent: 'center',
   },
 });

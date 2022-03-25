@@ -69,7 +69,7 @@ export default class TaskList extends Component {
           style={styles.touchIncluirTask}
           onPress={() => this.setState({mostrarAdicionarTask: true})}
           activeOpacity={0.7}>
-          <Icon name="plus" size={2m 0} color={commonStyles.colors.secondary} />
+          <Icon name="plus" size={20} color={commonStyles.colors.secondary} />
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -115,7 +115,6 @@ export default class TaskList extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection:'column',
   },
   background: {
     flex: 3,
@@ -150,7 +149,7 @@ const styles = StyleSheet.create({
   touchIncluirTask: {
     position: 'absolute',
     opacity: 0.9,
-    Left: 30,
+    right: 30,
     bottom: 30,
     width: 50,
     height: 50,
