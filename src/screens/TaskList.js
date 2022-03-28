@@ -23,7 +23,7 @@ import Tasks from '../classes/Tasks';
 import AdicionarTask from './AdicionarTask';
 
 LogBox.ignoreLogs([
-  "[react-native-gesture-handler] Seems like you\'re using an old API with gesture components, check out new Gestures system!",
+  "[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
 ]);
 
 export default class TaskList extends Component {
@@ -73,6 +73,7 @@ export default class TaskList extends Component {
             )}
           />
         </View>
+
         <TouchableOpacity
           style={styles.touchIncluirTask}
           onPress={() => this.setState({mostrarAdicionarTask: true})}
