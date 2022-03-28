@@ -6,6 +6,7 @@ import {
   StyleSheet,
   View,
   FlatList,
+  Alert,
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from 'react-native';
@@ -31,6 +32,7 @@ export default class TaskList extends Component {
         <AdicionarTask
           isVisible={this.state.mostrarAdicionarTask}
           onCancel={() => this.setState({mostrarAdicionarTask: false})}
+          onSave={this.addTask}
         />
 
         <ImageBackground source={TodayImage} style={styles.background}>
@@ -74,6 +76,27 @@ export default class TaskList extends Component {
       </SafeAreaView>
     );
   }
+
+  addTask = newTask => {
+    if (newTask.descricao && newTask.descricao.trim()) {
+      let tasks = [...this.state.tasks];
+
+      tasks.push({
+        id: newTask.id,
+        descricao: newTask.descricao,
+        dataEstimada: newTask.dataEstimada,
+        dataConclusao: null,
+      });
+
+      this.setState(
+        {tasks, mostrarAdicionarTask: false},
+        this.mostrarOcultarTasksConcluidas,
+      );
+    } else {
+      Alert.alert('Alerta', 'Descrição inválida!', [{text: 'OK'}]);
+      return;
+    }
+  };
 
   componentDidMount = () => {
     this.mostrarOcultarTasksConcluidas();

@@ -24,36 +24,6 @@ const initialState = {
 export default class AdicionarTask extends Component {
   state = {...initialState};
 
-  getDatePicker = () => {
-    let datePicker = (
-      <DateTimePicker
-        value={this.state.dataEstimada}
-        onChange={(_, dataEstimada) =>
-          this.setState({dataEstimada, mostrarDatePicker: false})
-        }
-        mode="date"
-      />
-    );
-
-    if (Platform.OS === 'android') {
-      datePicker = (
-        <View style={[styles.input, styles.data]}>
-          <TouchableOpacity
-            onPress={() => this.setState({mostrarDatePicker: true})}>
-            <Text>
-              {moment(this.state.dataEstimada).format(
-                'ddd, D [de] MMMM [de] YYYY',
-              )}
-            </Text>
-          </TouchableOpacity>
-          {this.state.mostrarDatePicker && datePicker}
-        </View>
-      );
-    }
-
-    return datePicker;
-  };
-
   render() {
     return (
       <Modal
@@ -80,7 +50,7 @@ export default class AdicionarTask extends Component {
             <TouchableOpacity onPress={this.props.onCancel}>
               <Text style={styles.botao}>Cancelar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={this.props.onSave}>
+            <TouchableOpacity onPress={this.save}>
               <Text style={styles.botao}>Salvar</Text>
             </TouchableOpacity>
           </View>
@@ -92,6 +62,49 @@ export default class AdicionarTask extends Component {
       </Modal>
     );
   }
+
+  save = () => {
+    const newTask = {
+      id: Math.random(),
+      descricao: this.state.descricao,
+      dataEstimada: this.state.dataEstimada,
+    };
+
+    // condicional resumida: (true) => expressão
+    this.props.onSave && this.props.onSave(newTask);
+    this.setState({...initialState});
+  };
+
+  getDatePicker = () => {
+    let datePicker = (
+      <DateTimePicker
+        value={this.state.dataEstimada}
+        onChange={(_, dataEstimada) =>
+          this.setState({dataEstimada, mostrarDatePicker: false})
+        }
+        mode="date"
+      />
+    );
+
+    if (Platform.OS === 'android') {
+      datePicker = (
+        <View style={[styles.input, styles.data]}>
+          <TouchableOpacity
+            onPress={() => this.setState({mostrarDatePicker: true})}>
+            <Text>
+              {moment(this.state.dataEstimada).format(
+                'ddd, D [de] MMMM [de] YYYY',
+              )}
+            </Text>
+          </TouchableOpacity>
+          {/* condicional resumida: (true) => expressão*/}
+          {this.state.mostrarDatePicker && datePicker}
+        </View>
+      );
+    }
+
+    return datePicker;
+  };
 }
 
 const styles = StyleSheet.create({

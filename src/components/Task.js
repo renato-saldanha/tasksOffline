@@ -1,38 +1,65 @@
-import React from 'react';
-import {StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
+import React, {Component} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  Animated,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import commonStyles from '../commonStyles';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
+import Swipeable from 'react-native-swipeable';
 
-export default (props, state) => {
-  const estiloConcluidoOuNao =
-    props.dataConclusao != null ? {textDecorationLine: 'line-through'} : {};
+export default class Task extends Component {
+  constructor(props) {
+    super();
+    this.props = props;
+  }
 
-  const data = props.dataConclusao ? props.dataConclusao : props.dataEstimada;
-  const dataFormatada = moment(data)
-    .locale('pt-br')
-    .format('ddd, D [de] MMMM [de] YYYY');
+  render() {
+    const estiloConcluidoOuNao =
+      this.props.dataConclusao != null
+        ? {textDecorationLine: 'line-through'}
+        : {};
 
-  return (
-    <View style={styles.container}>
-      <TouchableWithoutFeedback
-        onPress={() => props.verificarMarcacaoTask(props.id)}>
-        <View style={styles.checkContainer}>
-          {getCheckView(props.dataConclusao)}
+    const data = this.props.dataConclusao
+      ? this.props.dataConclusao
+      : this.props.dataEstimada;
+    const dataFormatada = moment(data)
+      .locale('pt-br')
+      .format('ddd, D [de] MMMM [de] YYYY');
+
+    const renderRight = (progress, dragX) => {
+      <TouchableOpacity style={styles.checkContainer}>
+        <Text>Ola</Text>
+      </TouchableOpacity>;
+    };
+
+    return (
+      <Swipeable renderRightActions={renderRight}>
+        <View style={styles.container}>
+          <TouchableWithoutFeedback
+            onPress={() => this.props.verificarMarcacaoTask(this.props.id)}>
+            <View style={styles.checkContainer}>
+              {getCheckView(this.props.dataConclusao)}
+            </View>
+          </TouchableWithoutFeedback>
+          <View>
+            <Text style={[styles.descricao, estiloConcluidoOuNao]}>
+              {this.props.descricao}
+            </Text>
+            <Text style={styles.data}>{dataFormatada}</Text>
+          </View>
         </View>
-      </TouchableWithoutFeedback>
-      <View>
-        <Text style={[styles.descricao, estiloConcluidoOuNao]}>
-          {props.descricao}
-        </Text>
-        <Text style={styles.data}>{dataFormatada}</Text>
-      </View>
-    </View>
-  );
-};
+      </Swipeable>
+    );
+  }
+}
 
 function getCheckView(dataConclusao) {
   let view;
