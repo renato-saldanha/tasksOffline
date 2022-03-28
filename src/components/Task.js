@@ -1,65 +1,67 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TouchableWithoutFeedback,
   TouchableOpacity,
-  Animated,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {Swipeable} from 'react-native-gesture-handler';
 
 import commonStyles from '../commonStyles';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
-import Swipeable from 'react-native-swipeable';
 
-export default class Task extends Component {
-  constructor(props) {
-    super();
-    this.props = props;
-  }
+export default props => {
+  const estiloConcluidoOuNao =
+    props.dataConclusao != null ? {textDecorationLine: 'line-through'} : {};
 
-  render() {
-    const estiloConcluidoOuNao =
-      this.props.dataConclusao != null
-        ? {textDecorationLine: 'line-through'}
-        : {};
+  const data = props.dataConclusao ? props.dataConclusao : props.dataEstimada;
+  const dataFormatada = moment(data)
+    .locale('pt-br')
+    .format('ddd, D [de] MMMM [de] YYYY');
 
-    const data = this.props.dataConclusao
-      ? this.props.dataConclusao
-      : this.props.dataEstimada;
-    const dataFormatada = moment(data)
-      .locale('pt-br')
-      .format('ddd, D [de] MMMM [de] YYYY');
-
-    const renderRight = (progress, dragX) => {
-      <TouchableOpacity style={styles.checkContainer}>
-        <Text>Ola</Text>
-      </TouchableOpacity>;
-    };
-
-    return (
-      <Swipeable renderRightActions={renderRight}>
-        <View style={styles.container}>
-          <TouchableWithoutFeedback
-            onPress={() => this.props.verificarMarcacaoTask(this.props.id)}>
-            <View style={styles.checkContainer}>
-              {getCheckView(this.props.dataConclusao)}
-            </View>
-          </TouchableWithoutFeedback>
-          <View>
-            <Text style={[styles.descricao, estiloConcluidoOuNao]}>
-              {this.props.descricao}
-            </Text>
-            <Text style={styles.data}>{dataFormatada}</Text>
-          </View>
-        </View>
-      </Swipeable>
+  const confirmDelete = () => {
+    Alert.alert(
+      'Confirmação de exclusão.',
+      'Deseja realmente deletar este registro?',
+      [{text: 'Sim', onPress: () => props.deleteTask(props.id)}, {text: 'Não'}],
     );
-  }
-}
+  };
+
+  const renderRight = (progress, dragX) => {
+    return (
+      <TouchableOpacity
+        style={styles.buttonDelete}
+        onPress={() => confirmDelete()}>
+        <Icon name="remove" size={20} color="#FFF" />
+        <Text style={styles.textDelete}>Deletar</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <Swipeable renderRightActions={renderRight}>
+      <View style={styles.container}>
+        <TouchableWithoutFeedback
+          onPress={() => props.verificarMarcacaoTask(props.id)}>
+          <View style={styles.checkContainer}>
+            {getCheckView(props.dataConclusao)}
+          </View>
+        </TouchableWithoutFeedback>
+        <View>
+          <Text style={[styles.descricao, estiloConcluidoOuNao]}>
+            {props.descricao}
+          </Text>
+          <Text style={styles.data}>{dataFormatada}</Text>
+        </View>
+      </View>
+    </Swipeable>
+  );
+};
 
 function getCheckView(dataConclusao) {
   let view;
@@ -112,5 +114,19 @@ const styles = StyleSheet.create({
     fontFamily: commonStyles.fontFamily,
     color: commonStyles.colors.subText,
     fontSize: 12,
+  },
+  buttonDelete: {
+    flexDirection: 'row',
+    backgroundColor: 'red',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 2,
+  },
+  textDelete: {
+    fontFamily: commonStyles.fontFamily,
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+    padding: 5,
   },
 });

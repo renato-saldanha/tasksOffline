@@ -9,6 +9,7 @@ import {
   Alert,
   TouchableWithoutFeedback,
   TouchableOpacity,
+  LogBox,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -20,6 +21,10 @@ import TodayImage from '../../assets/imgs/today.jpg';
 import Task from '../components/Task';
 import Tasks from '../classes/Tasks';
 import AdicionarTask from './AdicionarTask';
+
+LogBox.ignoreLogs([
+  "[react-native-gesture-handler] Seems like you\'re using an old API with gesture components, check out new Gestures system!",
+]);
 
 export default class TaskList extends Component {
   state = Tasks;
@@ -62,6 +67,7 @@ export default class TaskList extends Component {
                 {...item}
                 {...this.state}
                 verificarMarcacaoTask={this.verificarMarcacaoTask}
+                deleteTask={this.deleteTask}
                 /* Comunicação indireta */
               />
             )}
@@ -96,6 +102,13 @@ export default class TaskList extends Component {
       Alert.alert('Alerta', 'Descrição inválida!', [{text: 'OK'}]);
       return;
     }
+  };
+
+  deleteTask = id => {
+    let tasks = [...this.state.tasks];
+    let indexItem = tasks.map(f => f.id).indexOf(id);
+    tasks.splice(indexItem, 1);
+    this.setState({tasks}, this.mostrarOcultarTasksConcluidas);
   };
 
   componentDidMount = () => {
