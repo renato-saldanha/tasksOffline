@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Swipeable} from 'react-native-gesture-handler';
+import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
 
 import commonStyles from '../commonStyles';
 
@@ -37,29 +37,41 @@ export default props => {
       <TouchableOpacity
         style={styles.buttonDelete}
         onPress={() => confirmDelete()}>
-        <Icon name="remove" size={20} color="#FFF" />
-        <Text style={styles.textDelete}>Deletar</Text>
+        <Icon name="trash" size={20} color="#FFF" />
       </TouchableOpacity>
     );
   };
 
-  return (
-    <Swipeable renderRightActions={renderRight}>
-      <View style={styles.container}>
-        <TouchableWithoutFeedback
-          onPress={() => props.verificarMarcacaoTask(props.id)}>
-          <View style={styles.checkContainer}>
-            {getCheckView(props.dataConclusao)}
-          </View>
-        </TouchableWithoutFeedback>
-        <View>
-          <Text style={[styles.descricao, estiloConcluidoOuNao]}>
-            {props.descricao}
-          </Text>
-          <Text style={styles.data}>{dataFormatada}</Text>
-        </View>
+  const renderLeft = (progress, dragX) => {
+    return (
+      <View style={styles.buttonDelete}>
+        <Icon name="trash" size={20} color="#FFF" />
       </View>
-    </Swipeable>
+    );
+  };
+
+  return (
+    <GestureHandlerRootView>
+      <Swipeable
+        renderRightActions={renderRight}
+        renderLeftActions={renderLeft}
+        on>
+        <View style={styles.container}>
+          <TouchableWithoutFeedback
+            onPress={() => props.verificarMarcacaoTask(props.id)}>
+            <View style={styles.checkContainer}>
+              {getCheckView(props.dataConclusao)}
+            </View>
+          </TouchableWithoutFeedback>
+          <View>
+            <Text style={[styles.descricao, estiloConcluidoOuNao]}>
+              {props.descricao}
+            </Text>
+            <Text style={styles.data}>{dataFormatada}</Text>
+          </View>
+        </View>
+      </Swipeable>
+    </GestureHandlerRootView>
   );
 };
 
@@ -118,15 +130,10 @@ const styles = StyleSheet.create({
   buttonDelete: {
     flexDirection: 'row',
     backgroundColor: 'red',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 2,
-  },
-  textDelete: {
-    fontFamily: commonStyles.fontFamily,
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-    padding: 5,
+    margin: 2,
+    borderRadius: 18,
+    width: 50,
   },
 });
