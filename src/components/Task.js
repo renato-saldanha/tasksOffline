@@ -28,14 +28,20 @@ export default props => {
     Alert.alert(
       'Confirmação de exclusão.',
       'Deseja realmente deletar este registro?',
-      [{text: 'Sim', onPress: () => props.deleteTask(props.id)}, {text: 'Não'}],
+      [
+        {
+          text: 'Sim',
+          onPress: () => props.deleteTask && props.deleteTask(props.id),
+        },
+        {text: 'Não'},
+      ],
     );
   };
 
   const renderRight = (progress, dragX) => {
     return (
       <TouchableOpacity
-        style={styles.buttonDelete}
+        style={styles.buttonDeleteRight}
         onPress={() => confirmDelete()}>
         <Icon name="trash" size={20} color="#FFF" />
       </TouchableOpacity>
@@ -44,7 +50,7 @@ export default props => {
 
   const renderLeft = (progress, dragX) => {
     return (
-      <View style={styles.buttonDelete}>
+      <View style={styles.buttonDeleteLeft}>
         <Icon name="trash" size={20} color="#FFF" />
       </View>
     );
@@ -55,7 +61,9 @@ export default props => {
       <Swipeable
         renderRightActions={renderRight}
         renderLeftActions={renderLeft}
-        on>
+        onSwipeableOpen={s => {
+          s === 'left' && props.deleteTask(props.id);
+        }}>
         <View style={styles.container}>
           <TouchableWithoutFeedback
             onPress={() => props.verificarMarcacaoTask(props.id)}>
@@ -127,8 +135,7 @@ const styles = StyleSheet.create({
     color: commonStyles.colors.subText,
     fontSize: 12,
   },
-  buttonDelete: {
-    flexDirection: 'row',
+  buttonDeleteRight: {
     backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
@@ -136,4 +143,10 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     width: 50,
   },
+  buttonDeleteLeft: {
+    width: '45%',
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });

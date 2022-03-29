@@ -12,6 +12,7 @@ import {
   LogBox,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -19,15 +20,21 @@ import 'moment/locale/pt-br';
 import commonStyles from '../commonStyles.js';
 import TodayImage from '../../assets/imgs/today.jpg';
 import Task from '../components/Task';
-import Tasks from '../classes/Tasks';
 import AdicionarTask from './AdicionarTask';
 
 LogBox.ignoreLogs([
   "[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
 ]);
 
+const initialState = {
+  mostrarTasksConcluidas: true,
+  mostrarAdicionarTask: false,
+  tasksVisiveis: [],
+  tasks: [],
+};
+
 export default class TaskList extends Component {
-  state = Tasks;
+  state = {...initialState};
 
   render() {
     const today = moment().locale('pt-br').format('ddd, D [de] MMMM');
@@ -112,15 +119,17 @@ export default class TaskList extends Component {
     this.setState({tasks}, this.mostrarOcultarTasksConcluidas);
   };
 
-  componentDidMount = () => {
-    this.mostrarOcultarTasksConcluidas();
-  };
-
   marcarDesmarcarVisibilidade = () => {
     this.setState(
       {mostrarTasksConcluidas: !this.state.mostrarTasksConcluidas},
       this.mostrarOcultarTasksConcluidas,
     );
+  };
+
+  componentDidMount = async () => {
+    const stateString = await AsyncStorage.getItem('state');
+    const state = JSON.parse(stateString) || initialState;
+    this.setState(state, this.mostrarOcultarTasksConcluidas);
   };
 
   mostrarOcultarTasksConcluidas = () => {
@@ -133,6 +142,8 @@ export default class TaskList extends Component {
     }
 
     this.setState({tasksVisiveis});
+
+    AsyncStorage.setItem('state', JSON.stringify(this.state));
   };
 
   /* Comunicação indireta */
